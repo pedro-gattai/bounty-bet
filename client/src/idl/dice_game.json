@@ -1,4 +1,10 @@
 {
+  "address": "6TMNF6Wrw7PCBbRgJUJSzQBn8g43XZ4Y28pSFGRX5jER",
+  "metadata": {
+    "name": "dice_game",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
   "version": "0.1.0",
   "name": "dice_game",
   "instructions": [
