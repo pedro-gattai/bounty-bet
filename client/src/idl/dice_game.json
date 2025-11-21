@@ -187,9 +187,7 @@
           {
             "name": "players",
             "type": {
-              "vec": {
-                "publicKey": {}
-              }
+              "vec": "pubkey"
             }
           },
           {
@@ -205,9 +203,7 @@
           {
             "name": "winner",
             "type": {
-              "option": {
-                "publicKey": {}
-              }
+              "option": "pubkey"
             }
           }
         ]

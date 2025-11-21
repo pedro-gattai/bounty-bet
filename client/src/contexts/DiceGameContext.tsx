@@ -4,10 +4,6 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import diceGameIDL from '../idl/dice_game.json'
 
-const DICE_GAME_PROGRAM_ID = new PublicKey(
-  import.meta.env.VITE_DICE_GAME_PROGRAM_ID || '6TMNF6Wrw7PCBbRgJUJSzQBn8g43XZ4Y28pSFGRX5jER'
-)
-
 interface DiceGameContextType {
   program: Program | null
   connection: Connection | null
@@ -58,9 +54,8 @@ export const DiceGameProvider = ({ children }: DiceGameProviderProps) => {
 
         const program = new Program(
           diceGameIDL as any,
-          DICE_GAME_PROGRAM_ID,
           provider
-        )
+        ) as any  // Using 'any' to bypass typing issues with Anchor 0.32 IDL format
 
         setProgram(program)
         setError(null)
@@ -147,7 +142,8 @@ export const fetchGameAccount = async (
   gameAccount: PublicKey
 ) => {
   try {
-    const game = await program.account.gameAccount.fetch(gameAccount)
+    // Using 'any' to bypass typing issues with Anchor 0.32 account access
+    const game = await (program as any).account.gameAccount.fetch(gameAccount)
     return game
   } catch (error) {
     console.error('Error fetching game account:', error)
