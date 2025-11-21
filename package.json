@@ -1,0 +1,36 @@
+{
+  "name": "bounty-bet-solana",
+  "version": "1.0.0",
+  "description": "Bounty Bet - Professional Decentralized Betting Protocol on Solana",
+  "private": true,
+  "workspaces": [
+    "client",
+    "tests"
+  ],
+  "scripts": {
+    "build": "npm run build:contract && npm run build:client",
+    "build:contract": "anchor build",
+    "build:client": "cd client && npm run build",
+    "test": "anchor test",
+    "test:local": "anchor test --skip-local-validator",
+    "deploy:devnet": "anchor deploy --provider.cluster devnet",
+    "deploy:local": "anchor deploy",
+    "dev": "concurrently \"anchor localnet\" \"cd client && npm run dev\"",
+    "dev:client": "cd client && npm run dev",
+    "clean": "anchor clean && rm -rf node_modules client/node_modules",
+    "fmt": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.0.3"
+  },
+  "keywords": [
+    "solana",
+    "anchor",
+    "betting",
+    "blockchain",
+    "web3"
+  ],
+  "author": "Pedro Gattai",
+  "license": "MIT"
+}

@@ -1,0 +1,211 @@
+# Deployment Guide - Vault Betting Protocol
+
+## Prerequisites
+
+1. **Install Rust**
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+2. **Install Solana CLI**
+```bash
+sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+```
+
+3. **Install Anchor Framework**
+```bash
+cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+avm install latest
+avm use latest
+```
+
+4. **Configure Solana CLI for Devnet**
+```bash
+solana config set --url devnet
+```
+
+5. **Create a new wallet (if you don't have one)**
+```bash
+solana-keygen new
+```
+
+6. **Airdrop SOL for deployment**
+```bash
+solana airdrop 2
+```
+
+## Build and Deploy
+
+### Step 1: Install Dependencies
+```bash
+cd vault-gaming-solana
+npm install
+```
+
+### Step 2: Build the Smart Contract
+```bash
+anchor build
+```
+
+### Step 3: Get the Program ID
+```bash
+solana address -k target/deploy/vault_betting-keypair.json
+```
+
+### Step 4: Update Program ID
+Update the program ID in:
+- `Anchor.toml`
+- `contracts/programs/vault_betting/src/lib.rs` (declare_id!)
+- `client/src/contexts/ProgramContext.tsx`
+
+### Step 5: Build Again with New ID
+```bash
+anchor build
+```
+
+### Step 6: Deploy to Devnet
+```bash
+anchor deploy --provider.cluster devnet
+```
+
+### Step 7: Verify Deployment
+```bash
+solana program show <PROGRAM_ID> --url devnet
+```
+
+## Testing
+
+### Run Tests Locally
+```bash
+anchor test
+```
+
+### Run Tests on Devnet
+```bash
+anchor test --provider.cluster devnet
+```
+
+## Client Application
+
+### Step 1: Install Client Dependencies
+```bash
+cd client
+npm install
+```
+
+### Step 2: Update Program ID
+Make sure the program ID in `client/src/contexts/ProgramContext.tsx` matches your deployed program.
+
+### Step 3: Run Development Server
+```bash
+npm run dev
+```
+
+### Step 4: Build for Production
+```bash
+npm run build
+```
+
+## Troubleshooting
+
+### "Insufficient funds" Error
+```bash
+solana airdrop 2
+```
+
+### Program Already Exists
+```bash
+solana program close <PROGRAM_ID> --bypass-warning
+```
+Then redeploy.
+
+### Transaction Too Large
+Reduce the size of your instructions or split them into multiple transactions.
+
+### RPC Rate Limiting
+Use a custom RPC endpoint:
+```bash
+solana config set --url https://api.devnet.solana.com
+```
+
+## Useful Commands
+
+### Check Balance
+```bash
+solana balance
+```
+
+### View Program Logs
+```bash
+solana logs <PROGRAM_ID>
+```
+
+### Get Transaction Details
+```bash
+solana confirm -v <TX_HASH>
+```
+
+### List Programs
+```bash
+solana program list
+```
+
+## Production Deployment
+
+For mainnet deployment:
+
+1. **Change network configuration**
+```bash
+solana config set --url mainnet-beta
+```
+
+2. **Update Anchor.toml**
+```toml
+[provider]
+cluster = "mainnet"
+```
+
+3. **Ensure sufficient SOL for deployment**
+Mainnet deployment requires approximately 2-3 SOL
+
+4. **Deploy**
+```bash
+anchor deploy --provider.cluster mainnet
+```
+
+## Monitoring
+
+### View Program Activity
+```bash
+solana logs <PROGRAM_ID> --url devnet
+```
+
+### Check Program Authority
+```bash
+solana program show <PROGRAM_ID> --url devnet
+```
+
+### Transfer Program Authority (if needed)
+```bash
+solana program set-upgrade-authority <PROGRAM_ID> <NEW_AUTHORITY> --url devnet
+```
+
+## Security Checklist
+
+Before mainnet deployment:
+- [ ] Audit smart contract code
+- [ ] Test all edge cases
+- [ ] Verify access controls
+- [ ] Check for reentrancy vulnerabilities
+- [ ] Validate all inputs
+- [ ] Test with multiple wallets
+- [ ] Verify fee calculations
+- [ ] Test time-based constraints
+- [ ] Document all known limitations
+
+## Support
+
+For issues or questions, please refer to:
+- [Solana Documentation](https://docs.solana.com)
+- [Anchor Documentation](https://www.anchor-lang.com)
+- [Project Repository](https://github.com/yourusername/vault-gaming-solana)
