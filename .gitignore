@@ -25,6 +25,7 @@ target/deploy/
 *.json
 !package*.json
 !tsconfig*.json
+!client/src/idl/*.json
 test-ledger/
 
 # Logs

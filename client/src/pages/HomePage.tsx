@@ -2,8 +2,6 @@ import { Link } from 'react-router-dom'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { motion } from 'framer-motion'
 import {
-  FaLock,
-  FaShieldAlt,
   FaBolt,
   FaUsers,
   FaTrophy,
@@ -32,7 +30,7 @@ const HomePage = () => {
       y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100
       }
     }
@@ -91,9 +89,9 @@ const HomePage = () => {
 
   const stats = [
     { label: "Total Volume", value: "0 SOL", color: "text-primary-400", icon: FaChartLine },
-    { label: "Active Bets", value: "0", color: "text-secondary-400", icon: FaBolt },
-    { label: "Completed Bets", value: "0", color: "text-green-400", icon: FaCheckCircle },
-    { label: "Total Users", value: "0", color: "text-purple-400", icon: FaUsers }
+    { label: "Active Games", value: "0", color: "text-secondary-400", icon: FaDice },
+    { label: "Games Played", value: "0", color: "text-green-400", icon: FaCheckCircle },
+    { label: "Total Players", value: "0", color: "text-purple-400", icon: FaUsers }
   ]
 
   return (
@@ -282,6 +280,74 @@ const HomePage = () => {
                 </motion.div>
               </Link>
             ))}
+          </div>
+        </motion.div>
+
+        {/* How to Play Section */}
+        <motion.div
+          className="py-16 md:py-24"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          <motion.h2
+            className="text-3xl md:text-4xl font-bold text-center mb-4"
+            variants={itemVariants}
+          >
+            How to <span className="text-gradient">Play & Win</span>
+          </motion.h2>
+          <motion.p
+            className="text-gray-400 text-center mb-16 text-lg"
+            variants={itemVariants}
+          >
+            Simple steps to start winning SOL
+          </motion.p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <motion.div
+              variants={itemVariants}
+              className="text-center"
+            >
+              <div className="w-20 h-20 mx-auto mb-4 bg-primary-500/20 rounded-full flex items-center justify-center">
+                <span className="text-3xl">👛</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">1. Connect Wallet</h3>
+              <p className="text-gray-400 text-sm">Connect your Solana wallet to get started</p>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="text-center"
+            >
+              <div className="w-20 h-20 mx-auto mb-4 bg-secondary-500/20 rounded-full flex items-center justify-center">
+                <span className="text-3xl">🎮</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">2. Choose Mode</h3>
+              <p className="text-gray-400 text-sm">Select 1v1 or multiplayer battle</p>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="text-center"
+            >
+              <div className="w-20 h-20 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
+                <span className="text-3xl">🎲</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">3. Roll Dice</h3>
+              <p className="text-gray-400 text-sm">Lock your SOL and roll for the highest score</p>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="text-center"
+            >
+              <div className="w-20 h-20 mx-auto mb-4 bg-green-500/20 rounded-full flex items-center justify-center">
+                <span className="text-3xl">🏆</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">4. Win Big</h3>
+              <p className="text-gray-400 text-sm">Winner takes all minus 2.5% platform fee</p>
+            </motion.div>
           </div>
         </motion.div>
 

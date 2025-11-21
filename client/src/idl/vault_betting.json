@@ -1,0 +1,580 @@
+{
+  "version": "0.1.0",
+  "name": "vault_betting",
+  "instructions": [
+    {
+      "name": "createTwoPartyBet",
+      "discriminator": [241, 99, 13, 176, 9, 58, 209, 84],
+      "accounts": [
+        {
+          "name": "betAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "participantA",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "betId",
+          "type": "u64"
+        },
+        {
+          "name": "participantB",
+          "type": "pubkey"
+        },
+        {
+          "name": "arbiter",
+          "type": "pubkey"
+        },
+        {
+          "name": "betAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minimumDecisionTime",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "depositBetFunds",
+      "discriminator": [90, 6, 50, 148, 161, 153, 42, 110],
+      "accounts": [
+        {
+          "name": "betAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositor",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "declareWinner",
+      "discriminator": [140, 135, 197, 50, 9, 23, 4, 80],
+      "accounts": [
+        {
+          "name": "betAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arbiter",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "winner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "withdrawWinnings",
+      "discriminator": [75, 180, 148, 117, 81, 100, 169, 50],
+      "accounts": [
+        {
+          "name": "betAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "winner",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "placeGroupBet",
+      "discriminator": [229, 197, 93, 76, 165, 119, 214, 196],
+      "accounts": [
+        {
+          "name": "betAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "groupBetAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bettor",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "choice",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "createMultiPartyBet",
+      "discriminator": [232, 157, 151, 189, 180, 139, 219, 127],
+      "accounts": [
+        {
+          "name": "multiBetAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "betId",
+          "type": "u64"
+        },
+        {
+          "name": "arbiter",
+          "type": "pubkey"
+        },
+        {
+          "name": "entryFee",
+          "type": "u64"
+        },
+        {
+          "name": "minimumDecisionTime",
+          "type": "i64"
+        },
+        {
+          "name": "maxParticipants",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "joinMultiPartyBet",
+      "discriminator": [185, 210, 68, 69, 211, 67, 94, 17],
+      "accounts": [
+        {
+          "name": "multiBetAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "participant",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "payArbiterFee",
+      "discriminator": [174, 193, 132, 41, 46, 95, 209, 253],
+      "accounts": [
+        {
+          "name": "betAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arbiter",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancelExpiredBet",
+      "discriminator": [59, 105, 241, 62, 188, 113, 105, 183],
+      "accounts": [
+        {
+          "name": "betAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "BetAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "betId",
+            "type": "u64"
+          },
+          {
+            "name": "participantA",
+            "type": "pubkey"
+          },
+          {
+            "name": "participantB",
+            "type": "pubkey"
+          },
+          {
+            "name": "arbiter",
+            "type": "pubkey"
+          },
+          {
+            "name": "betAmount",
+            "type": "u64"
+          },
+          {
+            "name": "participantADeposited",
+            "type": "bool"
+          },
+          {
+            "name": "participantBDeposited",
+            "type": "bool"
+          },
+          {
+            "name": "totalPool",
+            "type": "u64"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "betStartTime",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "completedAt",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "minimumDecisionTime",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "BetStatus"
+            }
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "betType",
+            "type": {
+              "defined": "BetType"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MultiPartyBetAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "betId",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "arbiter",
+            "type": "pubkey"
+          },
+          {
+            "name": "entryFee",
+            "type": "u64"
+          },
+          {
+            "name": "participants",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "deposits",
+            "type": {
+              "vec": "bool"
+            }
+          },
+          {
+            "name": "maxParticipants",
+            "type": "u8"
+          },
+          {
+            "name": "totalPool",
+            "type": "u64"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "betStartTime",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "completedAt",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "minimumDecisionTime",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "BetStatus"
+            }
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "betType",
+            "type": {
+              "defined": "BetType"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GroupBetAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "betId",
+            "type": "u64"
+          },
+          {
+            "name": "bettor",
+            "type": "pubkey"
+          },
+          {
+            "name": "choice",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "claimed",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ArbiterStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "arbiter",
+            "type": "pubkey"
+          },
+          {
+            "name": "totalArbitrated",
+            "type": "u64"
+          },
+          {
+            "name": "totalVolume",
+            "type": "u64"
+          },
+          {
+            "name": "disputeRate",
+            "type": "u16"
+          },
+          {
+            "name": "averageDecisionTime",
+            "type": "i64"
+          },
+          {
+            "name": "reputationScore",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "BetStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "WaitingForDeposits"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BetType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TwoParty"
+          },
+          {
+            "name": "MultiParty"
+          },
+          {
+            "name": "GroupBetting"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidBetStatus",
+      "msg": "Invalid bet status for this operation"
+    },
+    {
+      "code": 6001,
+      "name": "AlreadyDeposited",
+      "msg": "You have already deposited funds"
+    },
+    {
+      "code": 6002,
+      "name": "UnauthorizedDepositor",
+      "msg": "You are not authorized to deposit to this bet"
+    },
+    {
+      "code": 6003,
+      "name": "UnauthorizedArbiter",
+      "msg": "Only the arbiter can declare the winner"
+    },
+    {
+      "code": 6004,
+      "name": "MinimumTimeNotMet",
+      "msg": "Minimum decision time has not passed yet"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidWinner",
+      "msg": "Winner must be one of the participants"
+    },
+    {
+      "code": 6006,
+      "name": "BetNotCompleted",
+      "msg": "Bet has not been completed yet"
+    },
+    {
+      "code": 6007,
+      "name": "NoWinnerDeclared",
+      "msg": "No winner has been declared"
+    },
+    {
+      "code": 6008,
+      "name": "NotTheWinner",
+      "msg": "You are not the winner"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidChoice",
+      "msg": "Invalid choice for group bet"
+    },
+    {
+      "code": 6010,
+      "name": "MaxParticipantsReached",
+      "msg": "Maximum participants reached"
+    },
+    {
+      "code": 6011,
+      "name": "AlreadyJoined",
+      "msg": "You have already joined this bet"
+    },
+    {
+      "code": 6012,
+      "name": "CannotCancelActiveBet",
+      "msg": "Cannot cancel an active bet"
+    },
+    {
+      "code": 6013,
+      "name": "NotExpiredYet",
+      "msg": "Bet has not expired yet"
+    }
+  ],
+  "metadata": {
+    "address": "8AUxvDBey9utjsGvtnaAjFeX33SBtMbzeuQPad3BGYAK"
+  }
+}

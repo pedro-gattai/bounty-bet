@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Link } from 'react-router-dom'
-import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FaWallet,
@@ -15,7 +14,6 @@ import {
   FaHistory,
   FaGamepad,
   FaClock,
-  FaCheckCircle,
   FaTimesCircle
 } from 'react-icons/fa'
 

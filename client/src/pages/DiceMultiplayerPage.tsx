@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
-import { useDiceGame, createDiceGame, joinDiceGame, rollDice, fetchGameAccount } from '../contexts/DiceGameContext'
+import { useDiceGame, createDiceGame, rollDice, fetchGameAccount } from '../contexts/DiceGameContext'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -33,7 +33,6 @@ const DiceMultiplayerPage = () => {
 
   // Game state
   const [gamePhase, setGamePhase] = useState<GamePhase>('waiting')
-  const [gameId, setGameId] = useState<BN | null>(null)
   const [gameAccount, setGameAccount] = useState<PublicKey | null>(null)
   const [currentRound, setCurrentRound] = useState(1)
   const [isCreator, setIsCreator] = useState(false)
@@ -95,7 +94,6 @@ const DiceMultiplayerPage = () => {
         MAX_PLAYERS
       )
 
-      setGameId(newGameId)
       setGameAccount(account)
       setIsCreator(true)
       setIsInGame(true)
@@ -114,29 +112,30 @@ const DiceMultiplayerPage = () => {
     }
   }
 
-  const handleJoinGame = async () => {
-    if (!program || !publicKey || !gameAccount) {
-      toast.error('Invalid game state')
-      return
-    }
+  // Unused for now - players join via handleCreateOrJoinGame
+  // const handleJoinGame = async () => {
+  //   if (!program || !publicKey || !gameAccount) {
+  //     toast.error('Invalid game state')
+  //     return
+  //   }
 
-    try {
-      await joinDiceGame(program, gameAccount, publicKey)
+  //   try {
+  //     await joinDiceGame(program, gameAccount, publicKey)
 
-      setIsInGame(true)
-      setPlayers(prev => [...prev, {
-        address: publicKey,
-        joined: true,
-        diceRoll: null,
-        isWinner: false
-      }])
+  //     setIsInGame(true)
+  //     setPlayers(prev => [...prev, {
+  //       address: publicKey,
+  //       joined: true,
+  //       diceRoll: null,
+  //       isWinner: false
+  //     }])
 
-      toast.success('Joined the game!')
-    } catch (error) {
-      console.error('Error joining game:', error)
-      toast.error('Failed to join game')
-    }
-  }
+  //     toast.success('Joined the game!')
+  //   } catch (error) {
+  //     console.error('Error joining game:', error)
+  //     toast.error('Failed to join game')
+  //   }
+  // }
 
   const handleStartGame = async () => {
     if (!program || !gameAccount || !isCreator) {
@@ -155,7 +154,7 @@ const DiceMultiplayerPage = () => {
         .startGame()
         .accounts({
           gameAccount,
-          starter: publicKey,
+          starter: publicKey!,
         })
         .rpc()
 
@@ -186,7 +185,7 @@ const DiceMultiplayerPage = () => {
       if (game) {
         // Update player rolls from game state
         const updatedPlayers = players.map((player, index) => {
-          const roll = game.rolls[index]
+          const roll = (game.rolls as any[])[index]
           if (roll && player.address.equals(publicKey)) {
             return {
               ...player,
@@ -202,8 +201,8 @@ const DiceMultiplayerPage = () => {
         setPlayers(updatedPlayers)
 
         // Check if all players have rolled
-        const allRolled = game.rolls.slice(0, game.currentPlayers).every((r: any) => r !== null)
-        if (allRolled && game.status.completed) {
+        const allRolled = (game.rolls as any[]).slice(0, (game as any).currentPlayers).every((r: any) => r !== null)
+        if (allRolled && (game.status as any).completed) {
           handleGameEnd()
         }
       }
@@ -227,11 +226,11 @@ const DiceMultiplayerPage = () => {
     if (program && gameAccount) {
       try {
         const game = await fetchGameAccount(program, gameAccount)
-        if (game && game.winner) {
+        if (game && (game as any).winner) {
           // Update players with winner info
           const updatedPlayers = players.map(player => ({
             ...player,
-            isWinner: player.address.equals(game.winner)
+            isWinner: player.address.equals((game as any).winner)
           }))
           setPlayers(updatedPlayers)
 
@@ -253,7 +252,6 @@ const DiceMultiplayerPage = () => {
     setTimeLeft(GAME_DURATION)
     setCurrentRound(currentRound + 1)
     setGameAccount(null)
-    setGameId(null)
     setIsCreator(false)
   }
 
@@ -275,7 +273,7 @@ const DiceMultiplayerPage = () => {
     toast.success(`Player joined! (${players.length + 1}/${MAX_PLAYERS})`)
 
     if (players.length + 1 === MAX_PLAYERS) {
-      toast.info('Room is full! Game will start soon.')
+      toast('Room is full! Game will start soon.')
     }
   }
 

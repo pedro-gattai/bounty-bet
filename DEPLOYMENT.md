@@ -93,8 +93,23 @@ cd client
 npm install
 ```
 
-### Step 2: Update Program ID
-Make sure the program ID in `client/src/contexts/ProgramContext.tsx` matches your deployed program.
+### Step 2: Configure Environment Variables
+Create a `.env` file in the `client` directory (copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your configuration:
+```env
+# Solana Network (devnet, testnet, or mainnet-beta)
+VITE_SOLANA_NETWORK=devnet
+
+# Optional: Custom RPC Endpoint (faster than public RPC)
+# VITE_RPC_ENDPOINT=https://api.devnet.solana.com
+
+# Dice Game Program ID (from your deployment)
+VITE_DICE_GAME_PROGRAM_ID=YOUR_PROGRAM_ID_HERE
+```
 
 ### Step 3: Run Development Server
 ```bash
@@ -105,6 +120,81 @@ npm run dev
 ```bash
 npm run build
 ```
+
+The build will be created in `client/dist/` directory.
+
+## Frontend Deployment (Cloudflare Pages / Vercel / Netlify)
+
+### Cloudflare Pages
+
+1. **Connect Repository**
+   - Go to Cloudflare Pages dashboard
+   - Connect your GitHub repository
+
+2. **Build Configuration**
+   - **Framework preset**: Vite
+   - **Build command**: `npm run build`
+   - **Build output directory**: `dist`
+   - **Root directory**: `client`
+
+3. **Environment Variables**
+   Add these in Cloudflare Pages settings:
+   ```
+   VITE_SOLANA_NETWORK=devnet
+   VITE_DICE_GAME_PROGRAM_ID=YOUR_PROGRAM_ID
+   ```
+
+4. **Deploy**
+   - Push to your repository
+   - Cloudflare will automatically build and deploy
+
+### Vercel
+
+1. **Import Project**
+   ```bash
+   vercel
+   ```
+
+2. **Configure**
+   - Root directory: `client`
+   - Build command: `npm run build`
+   - Output directory: `dist`
+
+3. **Environment Variables**
+   Add in Vercel dashboard or via CLI:
+   ```bash
+   vercel env add VITE_SOLANA_NETWORK
+   vercel env add VITE_DICE_GAME_PROGRAM_ID
+   ```
+
+### Netlify
+
+1. **Deploy**
+   ```bash
+   cd client
+   netlify deploy --prod
+   ```
+
+2. **Configuration** (netlify.toml)
+   ```toml
+   [build]
+     base = "client"
+     command = "npm run build"
+     publish = "dist"
+   ```
+
+3. **Environment Variables**
+   Add in Netlify dashboard under Site settings → Environment variables
+
+### Important Notes for Production
+
+- **IDL Files**: The IDL files (`client/src/idl/*.json`) must be committed to your repository
+- **Workflow**: When you update your Solana program:
+  1. Run `anchor build` locally
+  2. Copy updated IDL: `cp target/idl/dice_game.json client/src/idl/`
+  3. Update `VITE_DICE_GAME_PROGRAM_ID` if program ID changed
+  4. Commit and push changes
+  5. Frontend will auto-deploy with new IDL
 
 ## Troubleshooting
 

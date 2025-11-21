@@ -2,9 +2,11 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { Program, AnchorProvider, web3, BN } from '@coral-xyz/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
-import diceGameIDL from '../../../target/idl/dice_game.json'
+import diceGameIDL from '../idl/dice_game.json'
 
-const DICE_GAME_PROGRAM_ID = new PublicKey('6TMNF6Wrw7PCBbRgJUJSzQBn8g43XZ4Y28pSFGRX5jER')
+const DICE_GAME_PROGRAM_ID = new PublicKey(
+  import.meta.env.VITE_DICE_GAME_PROGRAM_ID || '6TMNF6Wrw7PCBbRgJUJSzQBn8g43XZ4Y28pSFGRX5jER'
+)
 
 interface DiceGameContextType {
   program: Program | null

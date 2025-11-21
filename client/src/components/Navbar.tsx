@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiMenu, HiX } from 'react-icons/hi'
-import { FaCoins } from 'react-icons/fa'
+import { FaDice } from 'react-icons/fa'
 
 const Navbar = () => {
   const location = useLocation()
@@ -60,14 +60,14 @@ const Navbar = () => {
               transition={{ duration: 0.6, ease: "easeInOut" }}
             >
               <div className="absolute inset-0 flex items-center justify-center">
-                <FaCoins className="text-white text-xl" />
+                <FaDice className="text-white text-xl" />
               </div>
             </motion.div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 via-secondary-400 to-primary-400 bg-clip-text text-transparent">
-                Bounty Bet
+                Dice Vault
               </span>
-              <span className="text-xs text-gray-500 font-medium -mt-1">Powered by Solana</span>
+              <span className="text-xs text-gray-500 font-medium -mt-1">Gaming on Solana</span>
             </div>
           </Link>
 

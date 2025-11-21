@@ -26,7 +26,6 @@ const DiceGamePage = () => {
   const [gameState, setGameState] = useState<GameState>('setup')
   const [betAmount, setBetAmount] = useState('0.1')
   const [opponentAddress, setOpponentAddress] = useState('')
-  const [gameId, setGameId] = useState<BN | null>(null)
   const [gameAccount, setGameAccount] = useState<PublicKey | null>(null)
 
   // Dice rolls
@@ -62,7 +61,6 @@ const DiceGamePage = () => {
 
     setLoading(true)
     try {
-      const opponent = new PublicKey(opponentAddress)
       const newGameId = new BN(Date.now())
       const entryFee = new BN(parseFloat(betAmount) * LAMPORTS_PER_SOL)
 
@@ -75,7 +73,6 @@ const DiceGamePage = () => {
         2 // Max 2 players for 1v1
       )
 
-      setGameId(newGameId)
       setGameAccount(account)
       setGameState('waiting_opponent')
       setTotalEscrow(parseFloat(betAmount))
@@ -128,8 +125,8 @@ const DiceGamePage = () => {
       const game = await fetchGameAccount(program, gameAccount)
       if (game) {
         // Find player's roll in the game data
-        const playerIndex = game.players.findIndex((p: PublicKey) => p.equals(publicKey))
-        const roll = game.rolls[playerIndex]
+        const playerIndex = (game.players as PublicKey[]).findIndex((p: PublicKey) => p.equals(publicKey))
+        const roll = (game.rolls as any[])[playerIndex]
 
         if (roll) {
           setPlayerRoll({
@@ -141,7 +138,7 @@ const DiceGamePage = () => {
 
         // Check if opponent has rolled
         const opponentIndex = 1 - playerIndex
-        const oppRoll = game.rolls[opponentIndex]
+        const oppRoll = (game.rolls as any[])[opponentIndex]
         if (oppRoll) {
           setOpponentRoll({
             dice1: oppRoll.dice1,
@@ -151,7 +148,7 @@ const DiceGamePage = () => {
         }
 
         // Check if game is completed
-        if (game.status.completed) {
+        if ((game.status as any).completed) {
           determineWinner(roll?.total || 0, oppRoll?.total || 0)
         }
       }
@@ -174,7 +171,7 @@ const DiceGamePage = () => {
       toast.error(`You lost. ${playerTotal} vs ${opponentTotal}`)
     } else {
       setWinner('tie')
-      toast.info(`It's a tie! ${playerTotal} vs ${opponentTotal}`)
+      toast(`It's a tie! ${playerTotal} vs ${opponentTotal}`)
     }
     setGameState('finished')
   }
@@ -488,7 +485,6 @@ const DiceGamePage = () => {
                 setWinner(null)
                 setTotalEscrow(0)
                 setGameAccount(null)
-                setGameId(null)
               }}
               className="btn-primary px-8 py-3 mt-8"
             >

@@ -23,11 +23,19 @@ import DiceMultiplayerPage from './pages/DiceMultiplayerPage'
 import '@solana/wallet-adapter-react-ui/styles.css'
 
 function App() {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
-  const network = WalletAdapterNetwork.Devnet
+  // The network can be set via environment variable (default: devnet)
+  const networkEnv = import.meta.env.VITE_SOLANA_NETWORK || 'devnet'
+  const network = networkEnv === 'mainnet-beta'
+    ? WalletAdapterNetwork.Mainnet
+    : networkEnv === 'testnet'
+    ? WalletAdapterNetwork.Testnet
+    : WalletAdapterNetwork.Devnet
 
-  // You can also provide a custom RPC endpoint
-  const endpoint = useMemo(() => clusterApiUrl(network), [network])
+  // Use custom RPC endpoint if provided, otherwise use public RPC
+  const endpoint = useMemo(() => {
+    const customEndpoint = import.meta.env.VITE_RPC_ENDPOINT
+    return customEndpoint || clusterApiUrl(network)
+  }, [network])
 
   const wallets = useMemo(
     () => [

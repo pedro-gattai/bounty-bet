@@ -1,0 +1,447 @@
+{
+  "version": "0.1.0",
+  "name": "dice_game",
+  "instructions": [
+    {
+      "name": "createGame",
+      "accounts": [
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "gameId",
+          "type": "u64"
+        },
+        {
+          "name": "entryFee",
+          "type": "u64"
+        },
+        {
+          "name": "maxPlayers",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "joinGame",
+      "accounts": [
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "startGame",
+      "accounts": [
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "starter",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "rollDice",
+      "accounts": [
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "finalizeGame",
+      "accounts": [
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "emergencyWithdraw",
+      "accounts": [
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GameAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "gameId",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "entryFee",
+            "type": "u64"
+          },
+          {
+            "name": "maxPlayers",
+            "type": "u8"
+          },
+          {
+            "name": "currentPlayers",
+            "type": "u8"
+          },
+          {
+            "name": "totalPool",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "GameStatus"
+            }
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "startedAt",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "completedAt",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "players",
+            "type": {
+              "vec": {
+                "publicKey": {}
+              }
+            }
+          },
+          {
+            "name": "rolls",
+            "type": {
+              "vec": {
+                "option": {
+                  "defined": "DiceRoll"
+                }
+              }
+            }
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": {
+                "publicKey": {}
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "GameStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Waiting"
+          },
+          {
+            "name": "Playing"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DiceRoll",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dice1",
+            "type": "u8"
+          },
+          {
+            "name": "dice2",
+            "type": "u8"
+          },
+          {
+            "name": "total",
+            "type": "u8"
+          },
+          {
+            "name": "rolledAt",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "GameCreated",
+      "fields": [
+        {
+          "name": "gameId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "pubkey",
+          "index": false
+        },
+        {
+          "name": "entryFee",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "maxPlayers",
+          "type": "u8",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PlayerJoined",
+      "fields": [
+        {
+          "name": "gameId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "player",
+          "type": "pubkey",
+          "index": false
+        },
+        {
+          "name": "currentPlayers",
+          "type": "u8",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "GameStarted",
+      "fields": [
+        {
+          "name": "gameId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "playersCount",
+          "type": "u8",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "DiceRolled",
+      "fields": [
+        {
+          "name": "gameId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "player",
+          "type": "pubkey",
+          "index": false
+        },
+        {
+          "name": "dice1",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "dice2",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "total",
+          "type": "u8",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "GameCompleted",
+      "fields": [
+        {
+          "name": "gameId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "winner",
+          "type": "pubkey",
+          "index": false
+        },
+        {
+          "name": "prizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "winnerRoll",
+          "type": "u8",
+          "index": false
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidMaxPlayers",
+      "msg": "Invalid max players (must be 2-6)"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidEntryFee",
+      "msg": "Invalid entry fee"
+    },
+    {
+      "code": 6002,
+      "name": "GameFull",
+      "msg": "Game is full"
+    },
+    {
+      "code": 6003,
+      "name": "GameNotWaiting",
+      "msg": "Game is not waiting for players"
+    },
+    {
+      "code": 6004,
+      "name": "GameNotPlaying",
+      "msg": "Game is not in playing state"
+    },
+    {
+      "code": 6005,
+      "name": "AlreadyJoined",
+      "msg": "Player already joined this game"
+    },
+    {
+      "code": 6006,
+      "name": "PlayerNotInGame",
+      "msg": "Player not in this game"
+    },
+    {
+      "code": 6007,
+      "name": "AlreadyRolled",
+      "msg": "Player already rolled dice"
+    },
+    {
+      "code": 6008,
+      "name": "WaitingForRolls",
+      "msg": "Waiting for all players to roll"
+    },
+    {
+      "code": 6009,
+      "name": "NotEnoughPlayers",
+      "msg": "Not enough players to start"
+    },
+    {
+      "code": 6010,
+      "name": "NotCreator",
+      "msg": "Only creator can start the game"
+    },
+    {
+      "code": 6011,
+      "name": "GameStarted",
+      "msg": "Game already started"
+    },
+    {
+      "code": 6012,
+      "name": "NotExpired",
+      "msg": "Game not expired yet"
+    }
+  ]
+}
