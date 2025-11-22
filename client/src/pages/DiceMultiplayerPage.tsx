@@ -411,7 +411,7 @@ const DiceMultiplayerPage = () => {
                   // If balance is too low, request airdrop first
                   if (balance < 0.0001) {
                     console.log('[POLLING] Balance too low! Requesting airdrop...')
-                    toast.info('Balance too low. Requesting airdrop...')
+                    toast('Balance too low. Requesting airdrop...')
 
                     try {
                       await requestAirdrop(publicKey, 0.1)
@@ -1020,7 +1020,7 @@ const DiceMultiplayerPage = () => {
                           // If balance is too low, request airdrop first
                           if (currentBalance < 0.0001) {
                             console.log('[MANUAL CLAIM] Balance too low! Requesting airdrop...')
-                            toast.info('Balance too low. Requesting airdrop...')
+                            toast('Balance too low. Requesting airdrop...')
 
                             try {
                               await requestAirdrop(publicKey, 0.1)

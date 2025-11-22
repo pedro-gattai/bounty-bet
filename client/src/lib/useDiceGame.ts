@@ -303,7 +303,7 @@ export function useDiceGame() {
 
     try {
       const [gameAccount] = await getGameAccountPDA(gameId)
-      const accountData = await program.account.gameAccount.fetch(gameAccount)
+      const accountData = await (program.account as any).gameAccount.fetch(gameAccount)
 
       console.log('Game account fetched:', {
         gameId: accountData.gameId.toString(),
@@ -334,10 +334,10 @@ export function useDiceGame() {
     }
 
     try {
-      const games = await program.account.gameAccount.all()
+      const games = await (program.account as any).gameAccount.all()
       console.log(`Fetched ${games.length} games`)
 
-      return games.map(game => ({
+      return games.map((game: any) => ({
         publicKey: game.publicKey,
         account: game.account
       }))

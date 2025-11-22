@@ -19,8 +19,8 @@ export function getDiceGameIDL(): Idl {
   if (!cachedIDL) {
     cachedIDL = diceGameIDL as Idl
     console.log('IDL loaded:', {
-      name: cachedIDL.name,
-      version: cachedIDL.version,
+      name: (cachedIDL as any).name,
+      version: (cachedIDL as any).version,
       address: (cachedIDL as any).address,
       instructionCount: cachedIDL.instructions?.length || 0
     })
@@ -73,8 +73,8 @@ export async function getProgram(
     // Add detailed diagnostics
     console.log('=== DETAILED IDL DIAGNOSTICS ===')
     console.log('IDL structure:', {
-      name: idl.name,
-      version: idl.version,
+      name: (idl as any).name,
+      version: (idl as any).version,
       address: (idl as any).address,
       hasMetadata: !!(idl as any).metadata,
       accountsCount: idl.accounts?.length || 0,
@@ -83,23 +83,13 @@ export async function getProgram(
       instructionNames: idl.instructions?.map((i: any) => i.name) || []
     })
 
-    // Try creating program with explicit program ID (3 parameters)
+    // Try creating program with explicit program ID
     let program: Program
 
-    try {
-      // First attempt: Use explicit program ID
-      const programId = new PublicKey((idl as any).address)
-      console.log('Attempting with explicit program ID:', programId.toBase58())
-      program = new Program(idl, programId, provider)
-      console.log('✅ Program created with explicit ID')
-    } catch (explicitError) {
-      console.log('❌ Explicit ID failed:', explicitError)
-      console.log('Falling back to 2-parameter constructor...')
-
-      // Fallback: Let Anchor extract from IDL
-      program = new Program(idl, provider)
-      console.log('✅ Program created with IDL extraction')
-    }
+    // Use Anchor's Program constructor
+    const programId = new PublicKey((idl as any).address)
+    console.log('Creating program with ID:', programId.toBase58())
+    program = new Program(idl as any, provider as any)
 
     // Detailed logging of what was created
     console.log('=== PROGRAM CREATION DIAGNOSTICS ===')

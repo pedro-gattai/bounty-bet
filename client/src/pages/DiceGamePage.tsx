@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
 import { useDiceGame } from '../lib/useDiceGame'
@@ -28,7 +27,6 @@ type GameState = 'setup' | 'waiting_opponent' | 'playing' | 'rolling' | 'finishe
 
 const DiceGamePage = () => {
   const { connected, publicKey } = useWallet()
-  const { connection } = useConnection()
   const { program, loading: programLoading, error: programError } = useDiceGameContext()
   const {
     createGame,
@@ -47,7 +45,6 @@ const DiceGamePage = () => {
   const [currentGameId, setCurrentGameId] = useState<BN | null>(null)
   const [gameIdInput, setGameIdInput] = useState('')
   const [showGameId, setShowGameId] = useState(false)
-  const [isCreator, setIsCreator] = useState(false)
   const [balance, setBalance] = useState<number>(0)
   const [isRequestingAirdrop, setIsRequestingAirdrop] = useState(false)
   const [prizeClaimAttempted, setPrizeClaimAttempted] = useState(false)
@@ -168,7 +165,6 @@ const DiceGamePage = () => {
       await createGame(newGameId, entryFee, 2)
 
       setCurrentGameId(newGameId)
-      setIsCreator(true)
       setGameState('waiting_opponent')
       setTotalEscrow(parseFloat(betAmount))
       setShowGameId(true)
@@ -214,7 +210,6 @@ const DiceGamePage = () => {
       await joinGame(joinGameId)
 
       setCurrentGameId(joinGameId)
-      setIsCreator(false)
       setGameState('playing')
       setTotalEscrow(parseFloat(betAmount) * 2)
 
@@ -365,7 +360,7 @@ const DiceGamePage = () => {
                   // If balance is too low, request airdrop first
                   if (balance < 0.0001) {
                     console.log('[POLLING] Balance too low! Requesting airdrop...')
-                    toast.info('Balance too low. Requesting airdrop...')
+                    toast('Balance too low. Requesting airdrop...')
 
                     try {
                       await requestAirdrop(publicKey, 0.1)
@@ -919,7 +914,7 @@ const DiceGamePage = () => {
                     // If balance is too low, request airdrop first
                     if (currentBalance < 0.0001) {
                       console.log('[MANUAL CLAIM] Balance too low! Requesting airdrop...')
-                      toast.info('Balance too low. Requesting airdrop...')
+                      toast('Balance too low. Requesting airdrop...')
 
                       try {
                         await requestAirdrop(publicKey, 0.1)
@@ -959,7 +954,6 @@ const DiceGamePage = () => {
                 setCurrentGameId(null)
                 setGameIdInput('')
                 setShowGameId(false)
-                setIsCreator(false)
                 setPrizeClaimAttempted(false)
               }}
               className="btn-primary px-8 py-3 mt-8"
