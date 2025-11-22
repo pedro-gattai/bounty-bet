@@ -5,15 +5,15 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-dice_game = "6TMNF6Wrw7PCBbRgJUJSzQBn8g43XZ4Y28pSFGRX5jER"
+dice_game = "42kX7N73TVX16fufFaEaN2nfev4zDTa5TbvdAqXYKPd3"
 vault_betting = "8AUxvDBey9utjsGvtnaAjFeX33SBtMbzeuQPad3BGYAK"
 
 [programs.localnet]
-dice_game = "6TMNF6Wrw7PCBbRgJUJSzQBn8g43XZ4Y28pSFGRX5jER"
+dice_game = "42kX7N73TVX16fufFaEaN2nfev4zDTa5TbvdAqXYKPd3"
 vault_betting = "8AUxvDBey9utjsGvtnaAjFeX33SBtMbzeuQPad3BGYAK"
 
 [programs.mainnet]
-dice_game = "6TMNF6Wrw7PCBbRgJUJSzQBn8g43XZ4Y28pSFGRX5jER"
+dice_game = "42kX7N73TVX16fufFaEaN2nfev4zDTa5TbvdAqXYKPd3"
 vault_betting = "8AUxvDBey9utjsGvtnaAjFeX33SBtMbzeuQPad3BGYAK"
 
 [registry]
@@ -24,7 +24,7 @@ cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [workspace]
-members = ["contracts/programs/*"]
+members = ["programs/*"]
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

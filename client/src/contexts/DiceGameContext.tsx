@@ -1,27 +1,23 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { Program, AnchorProvider, web3, BN } from '@coral-xyz/anchor'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Program } from '@coral-xyz/anchor'
+import { Connection } from '@solana/web3.js'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
-import diceGameIDL from '../idl/dice_game.json'
+import { getProgram, clearProgramCache } from '../lib/anchorProgram'
 
 interface DiceGameContextType {
   program: Program | null
-  connection: Connection | null
+  connection: Connection
   loading: boolean
   error: string | null
+  refreshProgram: () => Promise<void>
 }
 
-const DiceGameContext = createContext<DiceGameContextType>({
-  program: null,
-  connection: null,
-  loading: true,
-  error: null,
-})
+const DiceGameContext = createContext<DiceGameContextType | undefined>(undefined)
 
-export const useDiceGame = () => {
+export const useDiceGameContext = () => {
   const context = useContext(DiceGameContext)
   if (!context) {
-    throw new Error('useDiceGame must be used within a DiceGameProvider')
+    throw new Error('useDiceGameContext must be used within a DiceGameProvider')
   }
   return context
 }
@@ -37,116 +33,64 @@ export const DiceGameProvider = ({ children }: DiceGameProviderProps) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const initProgram = async () => {
-      if (!wallet || !connection) {
+  const initProgram = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      console.log('Initializing program with wallet:', wallet?.publicKey?.toBase58() || 'no wallet')
+
+      const prog = await getProgram(connection, wallet)
+
+      if (prog) {
+        console.log('Program initialized successfully:', {
+          programId: prog.programId.toBase58(),
+          hasWallet: !!wallet,
+          hasMethods: !!prog.methods,
+          methodCount: prog.methods ? Object.keys(prog.methods).length : 0
+        })
+        setProgram(prog)
+      } else {
+        console.log('Program initialization returned null (wallet likely not connected)')
         setProgram(null)
-        setLoading(false)
-        return
       }
-
-      try {
-        const provider = new AnchorProvider(
-          connection,
-          wallet,
-          { commitment: 'confirmed' }
-        )
-
-        const program = new Program(
-          diceGameIDL as any,
-          provider
-        ) as any  // Using 'any' to bypass typing issues with Anchor 0.32 IDL format
-
-        setProgram(program)
-        setError(null)
-      } catch (err) {
-        console.error('Error initializing dice game program:', err)
-        setError(err instanceof Error ? err.message : 'Unknown error')
-        setProgram(null)
-      } finally {
-        setLoading(false)
-      }
+    } catch (err) {
+      console.error('Error initializing dice game program:', err)
+      setError(err instanceof Error ? err.message : 'Unknown error')
+      setProgram(null)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  // Initialize program when wallet or connection changes
+  useEffect(() => {
     initProgram()
   }, [connection, wallet])
 
+  // Clear cache when wallet changes
+  useEffect(() => {
+    if (!wallet) {
+      clearProgramCache()
+    }
+  }, [wallet])
+
+  const refreshProgram = async () => {
+    clearProgramCache()
+    await initProgram()
+  }
+
   return (
-    <DiceGameContext.Provider value={{ program, connection, loading, error }}>
+    <DiceGameContext.Provider
+      value={{
+        program,
+        connection,
+        loading,
+        error,
+        refreshProgram
+      }}
+    >
       {children}
     </DiceGameContext.Provider>
   )
-}
-
-// Helper functions for dice game operations
-export const createDiceGame = async (
-  program: Program,
-  creator: PublicKey,
-  gameId: BN,
-  entryFee: BN,
-  maxPlayers: number
-) => {
-  const [gameAccount] = PublicKey.findProgramAddressSync(
-    [Buffer.from('dice_game'), gameId.toArrayLike(Buffer, 'le', 8)],
-    program.programId
-  )
-
-  const tx = await program.methods
-    .createGame(gameId, entryFee, maxPlayers)
-    .accounts({
-      gameAccount,
-      creator,
-      systemProgram: web3.SystemProgram.programId,
-    })
-    .rpc()
-
-  return { tx, gameAccount }
-}
-
-export const joinDiceGame = async (
-  program: Program,
-  gameAccount: PublicKey,
-  player: PublicKey
-) => {
-  const tx = await program.methods
-    .joinGame()
-    .accounts({
-      gameAccount,
-      player,
-      systemProgram: web3.SystemProgram.programId,
-    })
-    .rpc()
-
-  return tx
-}
-
-export const rollDice = async (
-  program: Program,
-  gameAccount: PublicKey,
-  player: PublicKey
-) => {
-  const tx = await program.methods
-    .rollDice()
-    .accounts({
-      gameAccount,
-      player,
-      systemProgram: web3.SystemProgram.programId,
-    })
-    .rpc()
-
-  return tx
-}
-
-export const fetchGameAccount = async (
-  program: Program,
-  gameAccount: PublicKey
-) => {
-  try {
-    // Using 'any' to bypass typing issues with Anchor 0.32 account access
-    const game = await (program as any).account.gameAccount.fetch(gameAccount)
-    return game
-  } catch (error) {
-    console.error('Error fetching game account:', error)
-    return null
-  }
 }
