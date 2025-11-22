@@ -338,8 +338,8 @@ MIT License - see [LICENSE](LICENSE)
 
 Developed by **Pedro Gattai**
 
-- GitHub: [@your-username](https://github.com/your-username)
-- Twitter: [@your-twitter](https://twitter.com/your-twitter)
+- GitHub: [@pedro-gattai](https://github.com/pedro-gattai)
+- X (Twitter): [@0xNomadcrypto](https://x.com/0xNomadcrypto)
 
 ## 🙏 Acknowledgments
 
