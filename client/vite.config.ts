@@ -7,11 +7,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      buffer: 'buffer',
     },
   },
   define: {
     'process.env': {},
     global: 'globalThis',
+    'globalThis.Buffer': ['buffer', 'Buffer'],
   },
   server: {
     port: 3000,
@@ -21,4 +23,12 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
+  optimizeDeps: {
+    include: ['buffer'],
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
+  }
 })
