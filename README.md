@@ -4,7 +4,7 @@ A decentralized dice game built on the Solana blockchain, where players bet SOL 
 
 ## 🔗 Quick Links
 
-**🎮 Live Demo:** [Play Now](https://seu-dominio.pages.dev)
+**🎮 Live Demo:** [Play Now](https://bounty-bet.pages.dev)
 
 **📦 Smart Contract (Devnet):**
 - **Program ID:** `42kX7N73TVX16fufFaEaN2nfev4zDTa5TbvdAqXYKPd3`
