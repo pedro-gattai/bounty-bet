@@ -54,7 +54,7 @@ const DiceMultiplayerPage = () => {
   const [currentRound, setCurrentRound] = useState(1)
   const [isCreator, setIsCreator] = useState(false)
   const [showGameId, setShowGameId] = useState(false)
-  const [balance, setBalance] = useState<number>(0)
+  const [balance, setBalance] = useState<number | null>(0)
   const [isRequestingAirdrop, setIsRequestingAirdrop] = useState(false)
   const [prizeClaimAttempted, setPrizeClaimAttempted] = useState(false)
 
@@ -159,7 +159,7 @@ const DiceMultiplayerPage = () => {
 
     // Check balance (bet + ~0.05 for fees)
     const requiredBalance = BET_AMOUNT + 0.05
-    if (balance < requiredBalance) {
+    if (balance !== null && balance < requiredBalance) {
       toast.error(`Insufficient balance! You need at least ${requiredBalance.toFixed(2)} SOL`)
       return
     }
@@ -214,7 +214,7 @@ const DiceMultiplayerPage = () => {
 
     // Check balance (bet + ~0.05 for fees)
     const requiredBalance = BET_AMOUNT + 0.05
-    if (balance < requiredBalance) {
+    if (balance !== null && balance < requiredBalance) {
       toast.error(`Insufficient balance! You need at least ${requiredBalance.toFixed(2)} SOL`)
       return
     }
@@ -409,7 +409,7 @@ const DiceMultiplayerPage = () => {
                   console.log('[POLLING] Current balance:', balance, 'SOL')
 
                   // If balance is too low, request airdrop first
-                  if (balance < 0.0001) {
+                  if (balance !== null && balance < 0.0001) {
                     console.log('[POLLING] Balance too low! Requesting airdrop...')
                     toast('Balance too low. Requesting airdrop...')
 
@@ -574,8 +574,8 @@ const DiceMultiplayerPage = () => {
               <FaWallet className="text-primary-400 text-xl" />
               <div>
                 <p className="text-sm text-gray-400">Your Balance</p>
-                <p className={`text-2xl font-bold ${balance < 0.2 ? 'text-red-400' : 'text-green-400'}`}>
-                  {balance.toFixed(4)} SOL
+                <p className={`text-2xl font-bold ${balance !== null && balance < 0.2 ? 'text-red-400' : 'text-green-400'}`}>
+                  {(balance ?? 0).toFixed(4)} SOL
                 </p>
               </div>
             </div>
@@ -815,7 +815,7 @@ const DiceMultiplayerPage = () => {
 
                             <button
                               onClick={handleCreateGame}
-                              disabled={!gameIdInput || balance < BET_AMOUNT + 0.05}
+                              disabled={!gameIdInput || (balance !== null && balance < BET_AMOUNT + 0.05)}
                               className="btn-primary w-full py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <FaCoins className="inline mr-2" />
@@ -860,12 +860,17 @@ const DiceMultiplayerPage = () => {
 
                             <button
                               onClick={handleJoinGame}
-                              disabled={!gameIdInput || balance < BET_AMOUNT + 0.05}
+                              disabled={!gameIdInput || (balance !== null && balance < BET_AMOUNT + 0.05)}
                               className="btn-primary w-full py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <FaUsers className="inline mr-2" />
                               Join Game ({BET_AMOUNT} SOL)
                             </button>
+                            {balance === null && (
+                              <p className="text-yellow-400 text-sm mt-2">
+                                ⚠️ Unable to verify balance. You may proceed, but ensure you have enough SOL.
+                              </p>
+                            )}
                           </div>
                         </>
                       )}
@@ -1018,7 +1023,7 @@ const DiceMultiplayerPage = () => {
                           console.log('[MANUAL CLAIM] Current balance:', currentBalance, 'SOL')
 
                           // If balance is too low, request airdrop first
-                          if (currentBalance < 0.0001) {
+                          if (currentBalance !== null && currentBalance < 0.0001) {
                             console.log('[MANUAL CLAIM] Balance too low! Requesting airdrop...')
                             toast('Balance too low. Requesting airdrop...')
 

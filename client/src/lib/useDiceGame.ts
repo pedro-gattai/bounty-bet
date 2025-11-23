@@ -391,16 +391,26 @@ export function useDiceGame() {
   }
 
   /**
-   * Check wallet balance
+   * Check wallet balance with retry logic
    */
-  const checkBalance = async (publicKey: PublicKey): Promise<number> => {
-    try {
-      const balance = await connection.getBalance(publicKey)
-      return balance / LAMPORTS_PER_SOL
-    } catch (error) {
-      console.error('Error checking balance:', error)
-      return 0
+  const checkBalance = async (publicKey: PublicKey, retries = 2): Promise<number | null> => {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const balance = await connection.getBalance(publicKey)
+        return balance / LAMPORTS_PER_SOL
+      } catch (error) {
+        console.error(`Error checking balance (attempt ${i + 1}/${retries + 1}):`, error)
+
+        // If not last retry, wait before trying again
+        if (i < retries) {
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+      }
     }
+
+    // Return null to indicate error (different from 0 balance)
+    console.warn('Failed to check balance after all retries')
+    return null
   }
 
   /**
